@@ -5,15 +5,39 @@
 
 #include <cstdint>
 #include <string>
+#include <set>
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
 //! possibly overlapping) into an in-order byte stream.
+
+struct Segment{
+  public:
+    size_t idx_;
+    std::string data_;
+  
+    Segment():idx_(0),data_(""){}
+
+    Segment(size_t idx, std::string data):idx_(idx), data_(data){}
+
+    bool operator<(const Segment& seg) const {
+      return this->idx_ < seg.idx_;
+    }
+};
+
+
 class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
+
+    std::set<Segment> _buffer;
+    bool _eof;
+    size_t _eof_idx;
+    size_t _unassembled_bytes;
+
+
 
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
@@ -30,6 +54,13 @@ class StreamReassembler {
     //! \param index indicates the index (place in sequence) of the first byte in `data`
     //! \param eof the last byte of `data` will be the last byte in the entire stream
     void push_substring(const std::string &data, const uint64_t index, const bool eof);
+    void handle_substring(const std::string &data, const uint64_t index);
+
+    void handle_overlap(Segment& seg);
+    void adjustment(Segment& seg, const std::set<Segment>::iterator &it);
+
+    void buffer_erase(const std::set<Segment>::iterator &it);
+    void buffer_insert(Segment& seg);
 
     //! \name Access the reassembled byte stream
     //!@{

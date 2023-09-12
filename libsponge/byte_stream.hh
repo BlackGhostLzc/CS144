@@ -9,6 +9,7 @@
 //! Bytes are written on the "input" side and read from the "output"
 //! side.  The byte stream is finite: the writer can end the input,
 //! and then no more bytes can be written.
+
 class ByteStream {
   private:
     // Your code here -- add private members as necessary.
@@ -24,9 +25,12 @@ class ByteStream {
     bool end_input_;       //能否再写
     bool _error{};  //!< Flag indicating that the stream suffered an error.
 
+
   public:
     //! Construct a stream with room for `capacity` bytes.
     ByteStream(const size_t capacity);
+
+    
 
     //! \name "Input" interface for the writer
     //!@{
